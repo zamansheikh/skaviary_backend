@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import mongoose from 'mongoose';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { ensureAdmin } from './src/database/ensure-admin.js';
 import authRoutes from './src/routes/auth.js';
 import productRoutes from './src/routes/products.js';
 import categoryRoutes from './src/routes/categories.js';
@@ -21,9 +22,12 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Connect to MongoDB
+// Connect to MongoDB and ensure admin exists
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('✅ Connected to MongoDB'))
+  .then(async () => {
+    console.log('✅ Connected to MongoDB');
+    await ensureAdmin();
+  })
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
 // Middleware
