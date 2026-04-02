@@ -80,7 +80,14 @@ router.post('/', authenticate, adminOnly, async (req, res) => {
 // Update product (admin)
 router.put('/:id', authenticate, adminOnly, async (req, res) => {
   try {
-    if (req.body.name) req.body.slug = createSlug(req.body.name);
+    if (req.body.name) {
+      const existing = await Product.findById(req.params.id);
+      if (existing && existing.name !== req.body.name) {
+        req.body.slug = createSlug(req.body.name);
+      } else {
+        delete req.body.slug;
+      }
+    }
     const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
     res.json({ success: true, data: product });

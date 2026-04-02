@@ -61,7 +61,15 @@ router.post('/', authenticate, adminOnly, async (req, res) => {
 // Update wiki entry (admin)
 router.put('/:id', authenticate, adminOnly, async (req, res) => {
   try {
-    if (req.body.name) req.body.slug = createSlug(req.body.name);
+    // Only regenerate slug if name actually changed
+    if (req.body.name) {
+      const existing = await BirdWiki.findById(req.params.id);
+      if (existing && existing.name !== req.body.name) {
+        req.body.slug = createSlug(req.body.name);
+      } else {
+        delete req.body.slug;
+      }
+    }
     const entry = await BirdWiki.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!entry) return res.status(404).json({ success: false, message: 'Bird not found' });
     res.json({ success: true, data: entry });
