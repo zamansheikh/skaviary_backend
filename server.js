@@ -15,6 +15,8 @@ import orderRoutes from './src/routes/orders.js';
 import reviewRoutes from './src/routes/reviews.js';
 import uploadRoutes from './src/routes/upload.js';
 import dashboardRoutes from './src/routes/dashboard.js';
+import couponRoutes from './src/routes/coupons.js';
+import subscriberRoutes from './src/routes/subscribers.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -46,6 +48,8 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/coupons', couponRoutes);
+app.use('/api/subscribers', subscriberRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

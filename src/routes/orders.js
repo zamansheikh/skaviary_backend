@@ -5,10 +5,15 @@ import { authenticate, adminOnly } from '../middleware/auth.js';
 
 const router = Router();
 
-// Get orders (user gets own, admin gets all)
+// Get orders (user gets own, admin gets all unless ?mine=true)
 router.get('/', authenticate, async (req, res) => {
   try {
-    const filter = req.user.role === 'admin' ? {} : { user: req.user.id };
+    let filter;
+    if (req.user.role === 'admin' && req.query.mine !== 'true') {
+      filter = {};
+    } else {
+      filter = { user: req.user.id };
+    }
     const orders = await Order.find(filter).populate('user', 'name email').sort({ createdAt: -1 });
     res.json({ success: true, data: orders });
   } catch (err) {

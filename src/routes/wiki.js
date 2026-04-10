@@ -36,10 +36,15 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get single wiki entry by slug
-router.get('/:slug', async (req, res) => {
+// Get single wiki entry by slug or ID
+router.get('/:slugOrId', async (req, res) => {
   try {
-    const entry = await BirdWiki.findOne({ slug: req.params.slug }).populate('category', 'name slug');
+    const param = req.params.slugOrId;
+    // Check if param is a valid MongoDB ObjectId (24 hex chars)
+    const isObjectId = /^[0-9a-fA-F]{24}$/.test(param);
+    const entry = isObjectId
+      ? await BirdWiki.findById(param).populate('category', 'name slug')
+      : await BirdWiki.findOne({ slug: param }).populate('category', 'name slug');
     if (!entry) return res.status(404).json({ success: false, message: 'Bird not found' });
     res.json({ success: true, data: entry });
   } catch (err) {

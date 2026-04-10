@@ -3,18 +3,21 @@ import Product from '../models/Product.js';
 import Order from '../models/Order.js';
 import User from '../models/User.js';
 import BirdWiki from '../models/BirdWiki.js';
+import Coupon from '../models/Coupon.js';
+import Subscriber from '../models/Subscriber.js';
 import { authenticate, adminOnly } from '../middleware/auth.js';
 
 const router = Router();
 
-// Get dashboard stats
 router.get('/stats', authenticate, adminOnly, async (req, res) => {
   try {
-    const [totalProducts, totalOrders, totalUsers, totalWiki, orders] = await Promise.all([
+    const [totalProducts, totalOrders, totalUsers, totalWiki, totalCoupons, totalSubscribers, orders] = await Promise.all([
       Product.countDocuments(),
       Order.countDocuments(),
       User.countDocuments(),
       BirdWiki.countDocuments(),
+      Coupon.countDocuments(),
+      Subscriber.countDocuments(),
       Order.find({ status: { $ne: 'cancelled' } }),
     ]);
 
@@ -24,12 +27,9 @@ router.get('/stats', authenticate, adminOnly, async (req, res) => {
     res.json({
       success: true,
       data: {
-        totalProducts,
-        totalOrders,
-        totalUsers,
-        totalWiki,
-        totalRevenue,
-        recentOrders,
+        totalProducts, totalOrders, totalUsers, totalWiki,
+        totalCoupons, totalSubscribers,
+        totalRevenue, recentOrders,
       },
     });
   } catch (err) {

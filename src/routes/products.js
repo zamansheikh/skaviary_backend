@@ -55,10 +55,14 @@ router.get('/featured', async (req, res) => {
   }
 });
 
-// Get single product by slug
-router.get('/:slug', async (req, res) => {
+// Get single product by slug or ID
+router.get('/:slugOrId', async (req, res) => {
   try {
-    const product = await Product.findOne({ slug: req.params.slug }).populate('category', 'name slug');
+    const param = req.params.slugOrId;
+    const isObjectId = /^[0-9a-fA-F]{24}$/.test(param);
+    const product = isObjectId
+      ? await Product.findById(param).populate('category', 'name slug')
+      : await Product.findOne({ slug: param }).populate('category', 'name slug');
     if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
     res.json({ success: true, data: product });
   } catch (err) {
